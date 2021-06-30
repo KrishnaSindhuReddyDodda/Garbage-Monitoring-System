@@ -1,0 +1,85 @@
+#include<TinyGPS++.h>
+#include<LiquidCrystal.h>
+LiquidCrystal lcd(12,11,5,4,3,2);
+double longitude;
+double latitude;
+int temp=0;
+int switcher=8;
+int c=0;
+int a=1;
+int GPSBaud=9600;
+TinyGPSPlus gps;
+void setup(){
+Serial.begin(9600);
+lcd.begin(16,8);
+lcd.setCursor(0,0);
+lcd.print("Gps based garbage monitoring");
+lcd.setCursor(0,1);
+lcd.print("Tracking System");
+delay(100);
+Serial.begin(GPSBaud);
+Serial.println();
+}
+void loop(){
+if(gps.encode(Serial.read()))
+displayInfo();
+else
+{
+Serial.println(F("No Gps Detected"));
+}
+if(temp==1)
+{
+if(c<a)
+{
+Serial.begin(9600);
+//lcd.print("Are you safe");
+delay(2000);
+lcd.clear();
+lcd.print("Press Reset");
+delay(10000);
+Serial.println("AT+CMGF=1");
+delay(1000);
+Serial.println("AT+CMGS=\"+8074085850\"\r");
+delay(1000);
+Serial.println("bin filled to end");
+Serial.print("Latitude(N):");
+Serial.println(latitude);
+Serial.print("Longitude(E):");
+Serial.println(longitude);
+Serial.print("please Remove the garbage");
+delay(100);
+Serial.println((char)26);
+delay(1000);
+c++;
+}
+}
+}
+void displayInfo()
+{
+if(digitalRead(switcher)==1)
+{
+temp=1;
+Serial.println("Accident has happened");
+delay(1000);
+}
+else{
+Serial.println("Car is ok");
+}
+Serial.print(F("Location:"));
+if(gps.location.isValid())
+{
+Serial.print(gps.location.lat(),6);
+latitude=gps.location.lat;
+lcd.print("LAT:");
+lcd.print(latitude);
+delay(500);
+lcd.clear();
+Serial.print(F(","));
+Serial.print(gps.location.log(),6);
+longitude=gps.location.log());
+lcd.print("LONG:");
+lcd.print(longitude);
+delay(1000);
+lcd.clear();
+}
+else{
